@@ -1,0 +1,5 @@
+/vendor
+.env
+.vagrant
+*.log
+/test_db
