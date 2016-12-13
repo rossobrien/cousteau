@@ -23,9 +23,25 @@ final class Query extends Model
 	 */
 	public function getDataAttribute()
 	{
+		$results = array();
 		try
 		{
-			$results = \DB::connection('data')->select($this->query);
+			$connectionPDO = \DB::connection('data')->getPdo();
+			$connectionPDO->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+			$statement = $connectionPDO->prepare($this->query);
+			$statement->execute();
+			$count = 0;
+			while ($record = $statement->fetch(\PDO::FETCH_ASSOC)) {
+				if ($count < 50000)
+				{
+					$count++;
+					$results[] = $record;
+				}
+				else 
+				{
+					break;
+				}
+			}
 		}
 		catch (\Exception $ex)
 		{
